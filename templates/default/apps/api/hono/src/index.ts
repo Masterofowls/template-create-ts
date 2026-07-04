@@ -6,7 +6,6 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { Server as SocketServer } from "socket.io";
-import { createAuth } from "./auth.ts";
 import { env } from "./env.ts";
 
 const app = new Hono();
@@ -20,10 +19,6 @@ app.use(
   }),
 );
 app.use("*", secureHeaders());
-
-const auth = createAuth();
-
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 app.get("/health", (c) => {
   const response = healthResponseSchema.parse({

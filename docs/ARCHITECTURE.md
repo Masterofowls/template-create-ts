@@ -8,7 +8,7 @@
 template-create-ts (npm CLI)
 └── templates/default/
     ├── apps/
-    │   ├── api/     → Hono or Fastify + Better Auth + Socket.IO
+    │   ├── api/     → Hono or Fastify + Socket.IO
     │   └── web/     → React + Vite
     ├── packages/
     │   ├── db/      → Drizzle ORM schema & client
@@ -34,9 +34,9 @@ template-create-ts (npm CLI)
 | API | 9001 |
 | Drizzle Studio | 4983 (default) |
 
-## Auth Flow
+## Database
 
-Better Auth handles `/api/auth/*` routes with Drizzle SQLite adapter. Sessions, users, accounts, and verifications tables are defined in `@pkg/db`.
+Drizzle ORM with SQLite (libsql) is configured in `@pkg/db`. Example `notes` table schema included as a starting point.
 
 ## Security Layer
 

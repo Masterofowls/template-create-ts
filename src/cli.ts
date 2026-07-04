@@ -155,6 +155,17 @@ function applyFramework(projectDir: string, framework: Framework): void {
   rmSync(join(apiDir, "fastify"), { recursive: true, force: true });
 }
 
+function ensureNodeModulesInGitignore(projectDir: string): void {
+  const gitignorePath = join(projectDir, ".gitignore");
+  const nodeModulesEntry = "node_modules/";
+  let content = existsSync(gitignorePath) ? readFileSync(gitignorePath, "utf-8") : "";
+
+  if (!content.split(/\r?\n/).some((line) => line.trim() === nodeModulesEntry)) {
+    content = `${content.trimEnd()}\n\n# Dependencies\n${nodeModulesEntry}\n`;
+    writeFileSync(gitignorePath, content, "utf-8");
+  }
+}
+
 async function runInstall(projectDir: string): Promise<void> {
   console.log("\n📦 Installing dependencies with Bun...");
   const exitCode = await runCommand("bun", ["install"], projectDir);
@@ -204,6 +215,8 @@ async function main(): Promise<void> {
   walkAndReplace(targetDir, replacements);
 
   applyFramework(targetDir, options.framework);
+
+  ensureNodeModulesInGitignore(targetDir);
 
   const envExample = join(targetDir, ".env.example");
   const envFile = join(targetDir, ".env");

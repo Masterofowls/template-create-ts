@@ -50,7 +50,7 @@ export function App() {
     <div className="app">
       <header>
         <h1>{"{{PROJECT_NAME}}"}</h1>
-        <p>{"Fullstack TypeScript template — React + {{FRAMEWORK}} + Drizzle + Better Auth"}</p>
+        <p>{"Fullstack TypeScript template — React + {{FRAMEWORK}} + Drizzle"}</p>
       </header>
 
       <section className="card">

@@ -2,7 +2,7 @@
 
 Ultimate reusable TypeScript fullstack/backend template scaffolder.
 
-Scaffold production-ready monorepos with **Bun**, **React**, **Hono/Fastify**, **Drizzle ORM**, **Better Auth**, **Zod**, **Socket.IO**, and a comprehensive security toolchain.
+Scaffold production-ready monorepos with **Bun**, **React**, **Hono/Fastify**, **Drizzle ORM**, **Zod**, **Socket.IO**, and a comprehensive security toolchain.
 
 ## Quick Start
 
@@ -25,7 +25,6 @@ bunx template-create-ts my-api -f fastify
 - **React + Vite** — frontend on port 9000
 - **Hono or Fastify** — API server on port 9001
 - **Drizzle ORM** — SQLite (libsql) with Drizzle Kit & Studio
-- **Better Auth** — email/password authentication
 - **Zod** — runtime validation
 - **Socket.IO** — realtime messaging
 - **Biome** — linting & formatting

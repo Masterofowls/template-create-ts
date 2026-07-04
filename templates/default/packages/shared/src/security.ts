@@ -4,7 +4,7 @@ import DOMPurify from "isomorphic-dompurify";
 import secureJsonParse from "secure-json-parse";
 import xss from "xss";
 
-const SECRET_KEY = process.env.BETTER_AUTH_SECRET ?? "dev-secret-change-in-production";
+const SECRET_KEY = process.env.APP_SECRET ?? "dev-secret-change-me-in-production-32chars";
 
 export function sanitizeHtml(dirty: string): string {
   return DOMPurify.sanitize(dirty, { USE_PROFILES: { html: true } });

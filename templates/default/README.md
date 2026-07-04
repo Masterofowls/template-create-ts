@@ -11,7 +11,6 @@ Fullstack TypeScript monorepo scaffolded with [template-create-ts](https://www.n
 | Frontend | React + Vite |
 | API | {{FRAMEWORK}} (Hono or Fastify) |
 | ORM | Drizzle ORM + Drizzle Kit + Drizzle Studio |
-| Auth | Better Auth |
 | Validation | Zod |
 | Realtime | Socket.IO |
 | Lint/Format | Biome |
@@ -67,7 +66,7 @@ bun run dev:api   # http://localhost:9001
 ```
 {{PROJECT_NAME}}/
 ├── apps/
-│   ├── api/          # {{FRAMEWORK}} backend + Socket.IO + Better Auth
+│   ├── api/          # {{FRAMEWORK}} backend + Socket.IO
 │   └── web/          # React frontend
 ├── packages/
 │   ├── db/           # Drizzle schema & client
