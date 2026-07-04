@@ -1,0 +1,7 @@
+src/
+tsconfig.json
+biome.json
+test-scaffold/
+*.log
+.env
+.git/

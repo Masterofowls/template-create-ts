@@ -1,0 +1,56 @@
+{
+  "name": "template-create-ts",
+  "version": "1.0.0",
+  "description": "Ultimate reusable TypeScript fullstack/backend template scaffolder with Bun, React, Hono, Drizzle, Better Auth, and security tooling",
+  "type": "module",
+  "bin": {
+    "template-create-ts": "dist/cli.js",
+    "create-ts-app": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "bun build ./src/cli.ts --outdir dist --target node",
+    "dev": "bun run src/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": [
+    "typescript",
+    "template",
+    "fullstack",
+    "backend",
+    "bun",
+    "hono",
+    "fastify",
+    "drizzle",
+    "react",
+    "better-auth",
+    "scaffold",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Masterofowls/template-create-ts.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=20",
+    "bun": ">=1.1.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

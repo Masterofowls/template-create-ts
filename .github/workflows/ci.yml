@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Build CLI
+        run: bun run build
+
+      - name: Scaffold smoke test
+        run: bun run dev -- ci-smoke --no-install --no-git
+
+      - name: Verify scaffold structure
+        run: |
+          test -f ci-smoke/apps/api/src/index.ts
+          test -f ci-smoke/apps/web/src/App.tsx
+          test -f ci-smoke/packages/db/src/schema.ts

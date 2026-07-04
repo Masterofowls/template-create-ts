@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.cursor/
+*.log
+.env
+.npmrc.publish
+.DS_Store
+.idea/
+.vscode/
+coverage/
+test-scaffold/
+verify-app/
+ci-smoke/
