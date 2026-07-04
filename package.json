@@ -1,7 +1,7 @@
 {
   "name": "template-create-ts",
-  "version": "1.2.4",
-  "description": "Ultimate reusable TypeScript fullstack/backend template scaffolder with Bun, React, Hono, Drizzle, and security tooling",
+  "version": "1.3.0",
+  "description": "Ultimate reusable TypeScript fullstack/backend template scaffolder with Bun, React, Fastify, Drizzle, and security tooling",
   "type": "module",
   "bin": {
     "template-create-ts": "dist/cli.js",
@@ -23,7 +23,6 @@
     "fullstack",
     "backend",
     "bun",
-    "hono",
     "fastify",
     "drizzle",
     "react",

@@ -2,7 +2,7 @@
 
 Ultimate reusable TypeScript fullstack/backend template scaffolder.
 
-Scaffold production-ready monorepos with **Bun**, **React**, **Hono/Fastify**, **Drizzle ORM**, **Zod**, **Socket.IO**, and a comprehensive security toolchain.
+Scaffold production-ready monorepos with **Bun**, **React**, **Fastify**, **Drizzle ORM**, **Zod**, **Socket.IO**, and a comprehensive security toolchain.
 
 ## Quick Start
 
@@ -13,8 +13,8 @@ bunx template-create-ts my-app
 # Using npx
 npx template-create-ts my-app
 
-# Fastify backend instead of Hono
-bunx template-create-ts my-api -f fastify
+# API-only, no database
+bunx template-create-ts my-api --db none --no-web
 ```
 
 ## What You Get
@@ -23,14 +23,14 @@ bunx template-create-ts my-api -f fastify
 - **TypeScript** — strict mode, workspace monorepo
 - **Bun** — runtime & package manager
 - **React + Vite** — frontend on port 9000
-- **Hono or Fastify** — API server on port 9001
+- **Fastify** — API server on port 9001 with OpenAPI `/docs`
 - **Drizzle ORM** — SQLite (libsql) with Drizzle Kit & Studio
 - **Zod** — runtime validation
 - **Socket.IO** — realtime messaging
 - **Biome** — linting & formatting
 
 ### Testing
-- **Jest** — unit tests
+- **Vitest** — unit & integration tests
 - **Playwright** — E2E browser tests
 
 ### Security Tooling
@@ -39,7 +39,6 @@ bunx template-create-ts my-api -f fastify
 | `@bun-security-scanner/osv` | OSV vulnerability scanning |
 | `@nodesecure/cli` | Dependency analysis |
 | `snyk` | Security testing |
-| `npq` | Safe install auditing |
 | `lockfile-lint` | Lockfile integrity |
 | `bun-scan` | Bun security scan |
 | `depcheck` | Unused dependency detection |
@@ -53,10 +52,14 @@ bunx template-create-ts my-api -f fastify
 ```
 template-create-ts <project-name> [options]
 
-  -f, --framework <hono|fastify>  API framework (default: hono)
+  -i, --interactive               Prompt for database and options
+      --db <sqlite|postgres|none> Database (default: sqlite)
   -t, --template <name>           Template variant (default: default)
-  --no-install                    Skip bun install
-  --no-git                        Skip git init
+      --no-web                    API-only scaffold (skip React app)
+      --no-security               Skip heavy security devDependencies
+      --no-install                Skip bun install
+      --no-git                    Skip git init
+      --dry-run                   Preview actions without writing files
   -h, --help                      Show help
 ```
 

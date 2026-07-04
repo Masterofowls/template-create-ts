@@ -22,12 +22,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = join(__dirname, "..", "templates");
 const PKG_VERSION = readPackageVersion();
 
-type Framework = "hono" | "fastify";
 type Database = "sqlite" | "postgres" | "none";
 
 interface CliOptions {
   projectName: string;
-  framework: Framework;
   database: Database;
   template: string;
   includeWeb: boolean;
@@ -154,16 +152,6 @@ async function runInteractivePrompts(
       }
     }
 
-    const framework = await promptChoice(
-      rl,
-      "API framework:",
-      [
-        { label: "Hono (default, lightweight)", value: "hono" },
-        { label: "Fastify (plugin ecosystem)", value: "fastify" },
-      ],
-      partial.framework,
-    );
-
     const database = await promptChoice(
       rl,
       "Database:",
@@ -184,7 +172,6 @@ async function runInteractivePrompts(
 
     return {
       projectName,
-      framework,
       database,
       template: partial.template,
       includeWeb,
@@ -203,7 +190,6 @@ function parseCliArgs(): CliOptions {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
     options: {
-      framework: { type: "string", short: "f", default: "hono" },
       db: { type: "string", default: "sqlite" },
       template: { type: "string", short: "t", default: "default" },
       "no-install": { type: "boolean", default: false },
@@ -221,9 +207,8 @@ function parseCliArgs(): CliOptions {
 Usage: template-create-ts [project-name] [options]
 
 Options:
-  -i, --interactive               Prompt for framework, database, and options
-  -f, --framework <hono|fastify>  API framework (default: hono)
-      --db <sqlite|postgres|none>     Database (default: sqlite; none = no DB)
+  -i, --interactive               Prompt for database and options
+      --db <sqlite|postgres|none> Database (default: sqlite; none = no DB)
   -t, --template <name>           Template variant (default: default)
       --no-web                    API-only scaffold (skip React app)
       --no-security               Skip heavy security devDependencies
@@ -235,17 +220,11 @@ Options:
 Examples:
   bunx template-create-ts
   bunx template-create-ts my-app -i
-  bunx template-create-ts my-api -f fastify --db postgres --no-web
+  bunx template-create-ts my-api --db postgres --no-web
   bunx template-create-ts my-api --db none
   bunx template-create-ts my-app --dry-run
 `);
     process.exit(0);
-  }
-
-  const framework = values.framework as Framework;
-  if (framework !== "hono" && framework !== "fastify") {
-    console.error("Error: framework must be 'hono' or 'fastify'.");
-    process.exit(1);
   }
 
   const database = values.db as Database;
@@ -264,7 +243,6 @@ Examples:
 
   return {
     projectName: projectName ?? "",
-    framework,
     database,
     template: values.template as string,
     includeWeb: !values["no-web"],
@@ -299,31 +277,6 @@ function walkAndReplace(dir: string, replacements: Record<string, string>): void
       replaceInFile(fullPath, replacements);
     }
   }
-}
-
-function applyFramework(projectDir: string, framework: Framework): void {
-  const apiDir = join(projectDir, "apps", "api");
-  const frameworkDir = join(apiDir, framework);
-  const srcDir = join(apiDir, "src");
-
-  if (!existsSync(frameworkDir)) {
-    console.error(`Error: framework template '${framework}' not found.`);
-    process.exit(1);
-  }
-
-  const frameworkPkg = join(frameworkDir, "package.json");
-  if (existsSync(frameworkPkg)) {
-    cpSync(frameworkPkg, join(apiDir, "package.json"), { force: true });
-  }
-
-  mkdirSync(srcDir, { recursive: true });
-  const frameworkSrc = join(frameworkDir, "src");
-  if (existsSync(frameworkSrc)) {
-    cpSync(frameworkSrc, srcDir, { recursive: true });
-  }
-
-  rmSync(join(apiDir, "hono"), { recursive: true, force: true });
-  rmSync(join(apiDir, "fastify"), { recursive: true, force: true });
 }
 
 function applyNoWeb(projectDir: string): void {
@@ -478,7 +431,6 @@ async function postScaffoldHealthCheck(projectDir: string): Promise<void> {
 function printDryRunSummary(options: CliOptions, targetDir: string): void {
   console.log("\n[dry-run] Would create:");
   console.log(`  Directory: ${targetDir}`);
-  console.log(`  Framework: ${options.framework}`);
   console.log(`  Database:  ${options.database}`);
   console.log(`  Web app:   ${options.includeWeb ? "yes" : "no"}`);
   console.log(`  Security:  ${options.includeSecurity ? "full toolchain" : "quick only"}`);
@@ -517,7 +469,6 @@ async function main(): Promise<void> {
   }
 
   console.log(`Creating project: ${options.projectName}`);
-  console.log(`Framework: ${options.framework}`);
   console.log(`Database: ${options.database}`);
   console.log(`Web: ${options.includeWeb ? "yes" : "no"}`);
 
@@ -526,7 +477,6 @@ async function main(): Promise<void> {
 
   const replacements: Record<string, string> = {
     "{{PROJECT_NAME}}": options.projectName,
-    "{{FRAMEWORK}}": options.framework,
     "{{DB_DIALECT}}":
       options.database === "postgres"
         ? "postgresql"
@@ -543,7 +493,6 @@ async function main(): Promise<void> {
   };
   walkAndReplace(targetDir, replacements);
 
-  applyFramework(targetDir, options.framework);
   applyDatabase(targetDir, options.database);
   if (!options.includeWeb) applyNoWeb(targetDir);
   if (!options.includeSecurity) applyNoSecurity(targetDir);

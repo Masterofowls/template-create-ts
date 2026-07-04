@@ -1,0 +1,27 @@
+{
+  "name": "@pkg/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas": "./src/schemas.ts",
+    "./security": "./src/security.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "isomorphic-dompurify": "^2.19.0",
+    "is-unsafe": "^1.0.0",
+    "secure-json-parse": "^2.7.0",
+    "xss": "^1.0.15",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/dompurify": "^3.2.0",
+    "typescript": "^5.7.2"
+  }
+}

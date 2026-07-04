@@ -17,3 +17,5 @@
 - Verified scaffolded `test-dev-app`: `bun run dev` → API `/health` 200, web `http://127.0.0.1:9000` 200
 - **v1.2.3** — localhost dev: Vite `host: true`, dual-stack port checks, CORS accepts `localhost` + `127.0.0.1`, defaults use `http://localhost:9000/9001`; verified both URLs return 200
 - **v1.2.4** — Optional database: `DB_ENABLED=false` / `--db none`, lazy DB client, `/health` returns `database.status: disabled` with overall `ok`; no `db:push` required
+- Published **template-create-ts@1.2.4** to npm; fixed GitHub publish workflow (invalid `secrets` in `if` conditionals)
+- **v1.3.0** — Removed Hono; Fastify is the only API (flat `apps/api/src` layout); dropped `-f` / `--framework` CLI flag

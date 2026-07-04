@@ -16,6 +16,6 @@ git-fix-test/
 localhost-test/
 no-db-test/
 test-dev-app/
-v12-test/
+fastify-only-test/
 /.cursor
 /docs

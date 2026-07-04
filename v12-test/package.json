@@ -1,0 +1,49 @@
+{
+  "name": "v12-test",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "dev:web": "bun run --filter @app/web dev",
+    "dev:api": "bun run --filter @app/api dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "db:generate": "bun run --filter @pkg/db generate",
+    "db:migrate": "bun run --filter @pkg/db migrate",
+    "db:studio": "bun run --filter @pkg/db studio",
+    "db:push": "bun run --filter @pkg/db push",
+    "security": "bun run security:quick",
+    "security:quick": "bun run security:osv && bun run security:lockfile && bun run security:deps",
+    "security:full": "bun run security:quick && bun run security:snyk && bun run security:nodesecure && bun run security:scan",
+    "security:osv": "bunx @bun-security-scanner/osv",
+    "security:snyk": "snyk test || true",
+    "security:deps": "depcheck",
+    "security:lockfile": "lockfile-lint --path bun.lock --allowed-hosts npm --validate-https",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,json,md}": ["biome check --write --no-errors-on-unmatched"]
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@bun-security-scanner/osv": "^1.0.0",
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.2",
+    "depcheck": "^1.4.7",
+    "detective-typescript": "^15.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "lockfile-lint": "^4.14.1",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,6 +1,6 @@
 import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
-import { healthHttpStatus, healthResponseSchema, resolveServiceStatus } from "@pkg/shared/schemas";
+import { healthResponseSchema } from "@pkg/shared/schemas";
 
 const healthOpenApiSchema = z.object({
   status: z.enum(["ok", "degraded"]),
@@ -8,7 +8,7 @@ const healthOpenApiSchema = z.object({
   version: z.string(),
   framework: z.string(),
   database: z.object({
-    status: z.enum(["ok", "degraded", "disabled"]),
+    status: z.enum(["ok", "degraded"]),
     dialect: z.string(),
   }),
 });
@@ -30,15 +30,14 @@ export function createOpenApiApp() {
   app.openapi(healthRoute, async (c) => {
     const { checkDatabaseHealth } = await import("@pkg/db/health");
     const database = await checkDatabaseHealth();
-    const status = resolveServiceStatus(database);
     const response = healthResponseSchema.parse({
-      status,
+      status: database.status === "ok" ? "ok" : "degraded",
       timestamp: new Date().toISOString(),
       version: "1.0.0",
       framework: "hono",
       database,
     });
-    return c.json(response, healthHttpStatus(status));
+    return c.json(response, response.status === "ok" ? 200 : 503);
   });
 
   const echoRoute = createRoute({
@@ -65,7 +64,7 @@ export function createOpenApiApp() {
 
   app.doc("/openapi.json", {
     openapi: "3.0.0",
-    info: { title: "{{PROJECT_NAME}} API", version: "1.0.0" },
+    info: { title: "v12-test API", version: "1.0.0" },
   });
 
   app.get("/docs", swaggerUI({ url: "/openapi.json" }));

@@ -1,0 +1,14 @@
+{
+  "ignore": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "*.db",
+    ".env",
+    "playwright-report",
+    "test-results"
+  ],
+  "depcheck": {
+    "ignoreMatches": ["@types/*", "husky"]
+  }
+}

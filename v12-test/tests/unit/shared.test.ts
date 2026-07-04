@@ -1,4 +1,4 @@
-import { healthHttpStatus, healthResponseSchema, resolveServiceStatus } from "@pkg/shared/schemas";
+import { healthResponseSchema } from "@pkg/shared/schemas";
 import { hashValue, safeJsonParse, sanitizeText } from "@pkg/shared/security";
 import { describe, expect, it } from "vitest";
 
@@ -8,16 +8,10 @@ describe("shared schemas", () => {
       status: "ok" as const,
       timestamp: new Date().toISOString(),
       version: "1.0.0",
-      framework: "fastify",
+      framework: "hono",
       database: { status: "ok" as const, dialect: "sqlite" },
     };
     expect(healthResponseSchema.parse(data)).toEqual(data);
-  });
-
-  it("treats disabled database as healthy service", () => {
-    const database = { status: "disabled" as const, dialect: "none" };
-    expect(resolveServiceStatus(database)).toBe("ok");
-    expect(healthHttpStatus(resolveServiceStatus(database))).toBe(200);
   });
 });
 

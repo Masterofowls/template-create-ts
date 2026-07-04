@@ -1,4 +1,4 @@
-# {{PROJECT_NAME}}
+# v12-test
 
 Fullstack TypeScript monorepo scaffolded with [template-create-ts](https://www.npmjs.com/package/template-create-ts).
 
@@ -9,7 +9,7 @@ Fullstack TypeScript monorepo scaffolded with [template-create-ts](https://www.n
 | Runtime | [Bun](https://bun.sh) |
 | Language | TypeScript |
 | Frontend | React + Vite |
-| API | Fastify + OpenAPI `/docs` |
+| API | hono (Hono or Fastify) + OpenAPI `/docs` |
 | ORM | Drizzle ORM + Drizzle Kit + Drizzle Studio |
 | Validation | Zod |
 | Realtime | Socket.IO |
@@ -93,67 +93,6 @@ bun run db:push
 
 For Postgres via Docker: `docker compose up -d db` then `bun run db:push`.
 
-### Running without a database
-
-Skip the database entirely when you do not need it yet:
-
-```bash
-# Scaffold with no DB
-bunx template-create-ts my-app --db none
-
-# Or disable in an existing project's .env
-DB_ENABLED=false
-DATABASE_URL=off
-```
-
-Then start normally — no `db:push` required:
-
-```bash
-bun run dev
-```
-
-`/health` returns `database.status: "disabled"` and overall status **ok**. When you are ready:
-
-```bash
-# .env — enable and set your URL
-DB_ENABLED=true
-DATABASE_URL=file:packages/db/local.db
-DB_DIALECT=sqlite
-
-bun run db:push
-```
-
-### `localhost` refused / wrong port (9002, 9003…)
-
-Vite was auto-picking the next free port when 9000 was busy. Use the unified dev script:
-
-```bash
-bun run db:push
-bun run dev
-```
-
-This starts the API first (port 9001), then web on **http://localhost:9000**. If ports are busy you get a clear error instead of a silent port change.
-
-Free ports on Windows:
-
-```powershell
-netstat -ano | findstr :9000
-taskkill /PID <pid> /F
-```
-
-Both `http://localhost:9000` and `http://127.0.0.1:9000` work in dev (CORS accepts either).
-
-### `bun run dev:web` alone
-
-Web-only mode does not start the API. Health checks and `/api` proxy need the API on port 9001:
-
-```bash
-bun run dev:api   # terminal 1
-bun run dev:web   # terminal 2
-```
-
-Or just run `bun run dev` from the project root.
-
 ### `bun run dev` API exits immediately
 
 1. Check `.env` exists at repo root
@@ -163,9 +102,9 @@ Or just run `bun run dev` from the project root.
 ## Project Structure
 
 ```
-{{PROJECT_NAME}}/
+v12-test/
 ├── apps/
-│   ├── api/          # Fastify + Socket.IO + OpenAPI
+│   ├── api/          # hono + Socket.IO + OpenAPI
 │   └── web/          # React frontend
 ├── packages/
 │   ├── db/           # Drizzle schema & health checks

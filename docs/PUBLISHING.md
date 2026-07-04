@@ -70,7 +70,7 @@ git push origin main --tags
 # Or merge the Release Please PR (automated)
 ```
 
-Current version: **1.2.4** — localhost dev, optional DB (`--db none`), git scaffold fixes.
+Current version: **1.3.0** — Fastify-only API (Hono removed), localhost dev, optional DB (`--db none`).
 
 Tag **must** match `package.json` version (CI enforces this).
 

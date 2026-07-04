@@ -30,6 +30,7 @@
       "no-db-test",
       "test-dev-app",
       "v12-test",
+      "fastify-only-test",
       "git-fix-test",
       "templates/**/node_modules",
       "templates/**/dist"
