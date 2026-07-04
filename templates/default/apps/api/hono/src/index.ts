@@ -1,4 +1,5 @@
 import { createAdaptorServer } from "@hono/node-server";
+import { allowedCorsOrigins, resolveCorsOrigin } from "@pkg/shared/cors";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
@@ -13,7 +14,7 @@ root.use("*", logger());
 root.use(
   "*",
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: (origin) => resolveCorsOrigin(origin, env.CORS_ORIGIN),
     credentials: true,
   }),
 );
@@ -25,7 +26,7 @@ root.route("/", api);
 const server = createAdaptorServer(root);
 
 const io = new SocketServer(server, {
-  cors: { origin: env.CORS_ORIGIN, credentials: true },
+  cors: { origin: allowedCorsOrigins(env.CORS_ORIGIN), credentials: true },
 });
 
 io.on("connection", (socket) => {
@@ -47,8 +48,8 @@ io.on("connection", (socket) => {
 });
 
 server.listen(env.API_PORT, env.API_HOST, () => {
-  console.log(`🚀 Hono API running at http://${env.API_HOST}:${env.API_PORT}`);
-  console.log(`📚 OpenAPI docs at http://${env.API_HOST}:${env.API_PORT}/docs`);
+  console.log(`🚀 Hono API running at http://localhost:${env.API_PORT}`);
+  console.log(`📚 OpenAPI docs at http://localhost:${env.API_PORT}/docs`);
   console.log("🔌 Socket.IO attached on same port");
 });
 

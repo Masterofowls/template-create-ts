@@ -1,11 +1,11 @@
-import { checkDatabaseHealth } from "@pkg/db/health";
+import { checkDatabaseHealth } from "@pkg/db";
 import { sanitizeText } from "@pkg/shared/security";
 import { describe, expect, it } from "vitest";
 
 describe("API integration", () => {
   it("checks database health", async () => {
     const result = await checkDatabaseHealth();
-    expect(["ok", "degraded"]).toContain(result.status);
+    expect(["ok", "degraded", "disabled"]).toContain(result.status);
     expect(result.dialect).toBeTruthy();
   });
 

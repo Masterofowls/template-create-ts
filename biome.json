@@ -25,6 +25,12 @@
       "test-scaffold",
       "verify-app",
       "ci-smoke",
+      "ci-smoke-nodb",
+      "localhost-test",
+      "no-db-test",
+      "test-dev-app",
+      "v12-test",
+      "git-fix-test",
       "templates/**/node_modules",
       "templates/**/dist"
     ]

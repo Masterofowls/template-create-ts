@@ -1,6 +1,6 @@
 {
   "name": "template-create-ts",
-  "version": "1.2.0",
+  "version": "1.2.4",
   "description": "Ultimate reusable TypeScript fullstack/backend template scaffolder with Bun, React, Hono, Drizzle, and security tooling",
   "type": "module",
   "bin": {

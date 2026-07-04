@@ -28,11 +28,31 @@ jobs:
       - name: Lint
         run: bun run lint
 
+      - name: Typecheck
+        run: bun run typecheck
+
       - name: Build
         run: bun run build
 
-      - name: Scaffold smoke test
-        run: bun run dev -- ci-smoke --no-install --no-git --no-security
+      - name: Scaffold smoke test (sqlite)
+        run: bun run src/cli.ts ci-smoke --no-install --no-git --no-security
+
+      - name: Verify scaffold structure
+        run: |
+          test -f ci-smoke/apps/api/src/index.ts
+          test -f ci-smoke/apps/web/src/App.tsx
+          test -f ci-smoke/packages/db/src/schema.ts
+          test -f ci-smoke/packages/db/src/client.ts
+          test -f ci-smoke/scripts/dev.ts
+          test -f ci-smoke/scripts/check-ports.ts
+          test -f ci-smoke/vitest.config.ts
+          test -f ci-smoke/turbo.json
+
+      - name: Scaffold smoke test (no database)
+        run: bun run src/cli.ts ci-smoke-nodb --db none --no-install --no-git --no-security
+
+      - name: Verify no-db env
+        run: grep -q 'DB_ENABLED=false' ci-smoke-nodb/.env
 
       - uses: actions/setup-node@v4
         with:

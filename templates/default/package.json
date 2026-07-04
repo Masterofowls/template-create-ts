@@ -3,7 +3,8 @@
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "bun run --filter '*' dev",
+    "dev": "bun scripts/dev.ts",
+    "predev": "bun scripts/check-ports.ts",
     "dev:web": "bun run --filter @app/web dev",
     "dev:api": "bun run --filter @app/api dev",
     "build": "turbo run build",
@@ -29,7 +30,7 @@
     "security:lockfile": "lockfile-lint --path bun.lock --allowed-hosts npm --validate-https",
     "security:nodesecure": "nodesecure audit || true",
     "security:scan": "bun-scan || true",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "lint-staged": {
     "*.{ts,tsx,js,json,md}": ["biome check --write --no-errors-on-unmatched"]

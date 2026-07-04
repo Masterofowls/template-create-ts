@@ -23,7 +23,7 @@ const TEMPLATES_DIR = join(__dirname, "..", "templates");
 const PKG_VERSION = readPackageVersion();
 
 type Framework = "hono" | "fastify";
-type Database = "sqlite" | "postgres";
+type Database = "sqlite" | "postgres" | "none";
 
 interface CliOptions {
   projectName: string;
@@ -53,15 +53,47 @@ function runCommand(command: string, args: string[], cwd: string): Promise<numbe
     const proc = spawn(command, args, {
       cwd,
       stdio: "inherit",
-      shell: process.platform === "win32",
+      shell: process.platform === "win32" && command !== "git",
     });
     proc.on("close", (code) => resolve(code ?? 1));
     proc.on("error", () => resolve(1));
   });
 }
 
-function runCommandSync(command: string, args: string[], cwd: string): void {
-  spawnSync(command, args, { cwd, stdio: "inherit", shell: process.platform === "win32" });
+function runCommandSync(command: string, args: string[], cwd: string, useShell = false): void {
+  spawnSync(command, args, { cwd, stdio: "inherit", shell: useShell });
+}
+
+/** Git on Windows breaks multi-word -m messages when shell=true */
+function runGitSync(args: string[], cwd: string): void {
+  const result = spawnSync("git", args, {
+    cwd,
+    stdio: "inherit",
+    shell: false,
+    env: {
+      ...process.env,
+      GIT_TERMINAL_PROMPT: "0",
+    },
+  });
+  if (result.status !== 0) {
+    console.warn(`Warning: git ${args.join(" ")} exited with code ${result.status ?? 1}`);
+  }
+}
+
+function setupGitRepo(projectDir: string): void {
+  console.log("\n🔧 Initializing git repository...");
+  runGitSync(["init", "-b", "main"], projectDir);
+  runGitSync(["config", "core.autocrlf", "false"], projectDir);
+  runGitSync(["config", "core.eol", "lf"], projectDir);
+  runGitSync(["config", "advice.addIgnoredFile", "false"], projectDir);
+}
+
+function commitGitRepo(projectDir: string): void {
+  runGitSync(
+    ["add", "--all", "--", ".", ":!node_modules", ":!**/node_modules", ":!.bun"],
+    projectDir,
+  );
+  runGitSync(["commit", "-m", "chore: initial commit from template-create-ts"], projectDir);
 }
 
 function printBanner(): void {
@@ -138,6 +170,7 @@ async function runInteractivePrompts(
       [
         { label: "SQLite (local file, zero setup)", value: "sqlite" },
         { label: "PostgreSQL (Docker / production)", value: "postgres" },
+        { label: "None (skip DB — enable later)", value: "none" },
       ],
       partial.database,
     );
@@ -190,7 +223,7 @@ Usage: template-create-ts [project-name] [options]
 Options:
   -i, --interactive               Prompt for framework, database, and options
   -f, --framework <hono|fastify>  API framework (default: hono)
-      --db <sqlite|postgres>      Database dialect (default: sqlite)
+      --db <sqlite|postgres|none>     Database (default: sqlite; none = no DB)
   -t, --template <name>           Template variant (default: default)
       --no-web                    API-only scaffold (skip React app)
       --no-security               Skip heavy security devDependencies
@@ -203,6 +236,7 @@ Examples:
   bunx template-create-ts
   bunx template-create-ts my-app -i
   bunx template-create-ts my-api -f fastify --db postgres --no-web
+  bunx template-create-ts my-api --db none
   bunx template-create-ts my-app --dry-run
 `);
     process.exit(0);
@@ -215,8 +249,8 @@ Examples:
   }
 
   const database = values.db as Database;
-  if (database !== "sqlite" && database !== "postgres") {
-    console.error("Error: --db must be 'sqlite' or 'postgres'.");
+  if (database !== "sqlite" && database !== "postgres" && database !== "none") {
+    console.error("Error: --db must be 'sqlite', 'postgres', or 'none'.");
     process.exit(1);
   }
 
@@ -334,11 +368,15 @@ function applyNoSecurity(projectDir: string): void {
 
 function applyDatabase(projectDir: string, database: Database): void {
   const isPostgres = database === "postgres";
+  const isNone = database === "none";
   const replacements: Record<string, string> = {
-    "{{DB_DIALECT}}": isPostgres ? "postgresql" : "sqlite",
+    "{{DB_DIALECT}}": isPostgres ? "postgresql" : isNone ? "none" : "sqlite",
+    "{{DB_ENABLED}}": isNone ? "false" : "true",
     "{{DATABASE_URL}}": isPostgres
       ? "postgresql://postgres:postgres@localhost:5432/app"
-      : "file:./local.db",
+      : isNone
+        ? "off"
+        : "file:packages/db/local.db",
   };
   walkAndReplace(join(projectDir, "packages", "db"), replacements);
 }
@@ -366,7 +404,11 @@ function writeEnvFile(projectDir: string, database: Database): void {
   let content = readFileSync(envExample, "utf-8");
   const secret = generateAppSecret();
   content = content.replace(/APP_SECRET=.*/, `APP_SECRET=${secret}`);
-  if (database === "postgres") {
+  if (database === "none") {
+    content = content.replace(/DB_ENABLED=.*/, "DB_ENABLED=false");
+    content = content.replace(/DATABASE_URL=.*/, "DATABASE_URL=off");
+    content = content.replace(/DB_DIALECT=.*/, "DB_DIALECT=none");
+  } else if (database === "postgres") {
     content = content.replace(
       /DATABASE_URL=.*/,
       "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/app",
@@ -385,22 +427,11 @@ async function runInstall(projectDir: string): Promise<boolean> {
   return true;
 }
 
-function runGitInit(projectDir: string): void {
-  console.log("\n🔧 Initializing git repository...");
-  runCommandSync("git", ["init"], projectDir);
-  runCommandSync("git", ["add", "."], projectDir);
-  runCommandSync(
-    "git",
-    ["commit", "-m", "chore: initial commit from template-create-ts"],
-    projectDir,
-  );
-}
-
 async function waitForHealth(url: string, attempts = 20): Promise<boolean> {
   for (let i = 0; i < attempts; i++) {
     try {
       const res = await fetch(url);
-      if (res.ok) return true;
+      if (res.status === 200 || res.status === 503) return true;
     } catch {
       // retry
     }
@@ -496,11 +527,19 @@ async function main(): Promise<void> {
   const replacements: Record<string, string> = {
     "{{PROJECT_NAME}}": options.projectName,
     "{{FRAMEWORK}}": options.framework,
-    "{{DB_DIALECT}}": options.database === "postgres" ? "postgresql" : "sqlite",
+    "{{DB_DIALECT}}":
+      options.database === "postgres"
+        ? "postgresql"
+        : options.database === "none"
+          ? "none"
+          : "sqlite",
+    "{{DB_ENABLED}}": options.database === "none" ? "false" : "true",
     "{{DATABASE_URL}}":
       options.database === "postgres"
         ? "postgresql://postgres:postgres@localhost:5432/app"
-        : "file:./local.db",
+        : options.database === "none"
+          ? "off"
+          : "file:packages/db/local.db",
   };
   walkAndReplace(targetDir, replacements);
 
@@ -512,13 +551,17 @@ async function main(): Promise<void> {
   ensureNodeModulesInGitignore(targetDir);
   writeEnvFile(targetDir, options.database);
 
+  if (options.git) {
+    setupGitRepo(targetDir);
+  }
+
   let installed = false;
   if (options.install) {
     installed = await runInstall(targetDir);
   }
 
   if (options.git) {
-    runGitInit(targetDir);
+    commitGitRepo(targetDir);
   }
 
   if (installed) {
@@ -526,17 +569,20 @@ async function main(): Promise<void> {
   }
 
   const webHint = options.includeWeb
-    ? "  bun run dev:web        # Start React frontend (port 9000)\n"
+    ? "  bun run dev            # Start API + web (http://localhost:9000)\n"
     : "";
+
+  const dbHint =
+    options.database === "none"
+      ? ""
+      : "  bun run db:push        # Push database schema (first run)\n";
 
   console.log(`
 ✅ Project created successfully!
 
 Next steps:
   cd ${options.projectName}
-  bun run db:push        # Push database schema (first run)
-${webHint}  bun run dev:api        # Start API server (port 9001)
-  bun run dev            # Start all services
+${dbHint}${webHint}  bun run dev:api        # API only (port 9001)
   bun run test           # Run Vitest unit + integration tests
   bun run security:quick # Fast security audit (CI default)
 

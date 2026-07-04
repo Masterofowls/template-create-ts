@@ -1,0 +1,11 @@
+# Normalize line endings (prevents LF/CRLF warnings on Windows)
+* text=auto eol=lf
+
+# Windows scripts keep CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Dependencies are binary — never normalize
+node_modules/** -text
+.bun/** -text

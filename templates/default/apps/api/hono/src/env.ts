@@ -11,7 +11,7 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().url().default("http://localhost:9000"),
   DATABASE_URL: z.string().default("file:./local.db"),
   DB_DIALECT: z
-    .enum(["sqlite", "postgresql"])
+    .enum(["sqlite", "postgresql", "none"])
     .default(process.env.DATABASE_URL?.startsWith("postgres") ? "postgresql" : "sqlite"),
 });
 

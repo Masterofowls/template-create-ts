@@ -63,12 +63,14 @@ The workflow uses `NPM_TOKEN` when set; otherwise it relies on OIDC.
 
 ```bash
 # 1. Bump version in package.json + .release-please-manifest.json
-# 2. Commit and tag
-git tag v1.2.0
+# 2. Commit, tag (must match package.json), and push
+git tag v1.2.4
 git push origin main --tags
 
 # Or merge the Release Please PR (automated)
 ```
+
+Current version: **1.2.4** — localhost dev, optional DB (`--db none`), git scaffold fixes.
 
 Tag **must** match `package.json` version (CI enforces this).
 

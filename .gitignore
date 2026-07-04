@@ -11,4 +11,11 @@ coverage/
 test-scaffold/
 verify-app/
 ci-smoke/
+ci-smoke-nodb/
+git-fix-test/
+localhost-test/
+no-db-test/
+test-dev-app/
 v12-test/
+/.cursor
+/docs

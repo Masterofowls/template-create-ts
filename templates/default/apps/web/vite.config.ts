@@ -1,34 +1,36 @@
 import { resolve } from "node:path";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 
-export default defineConfig({
-  plugins: [react()],
-  envDir: resolve(__dirname, "../.."),
-  server: {
-    port: 9000,
-    strictPort: true,
-    proxy: {
-      "/api": {
-        target: process.env.VITE_API_URL ?? "http://localhost:9001",
-        changeOrigin: true,
-      },
-      "/health": {
-        target: process.env.VITE_API_URL ?? "http://localhost:9001",
-        changeOrigin: true,
-      },
-      "/docs": {
-        target: process.env.VITE_API_URL ?? "http://localhost:9001",
-        changeOrigin: true,
-      },
-      "/openapi.json": {
-        target: process.env.VITE_API_URL ?? "http://localhost:9001",
-        changeOrigin: true,
+export default defineConfig(({ mode }) => {
+  const envDir = resolve(__dirname, "../..");
+  const env = loadEnv(mode, envDir, "");
+  const port = Number(env.WEB_PORT ?? process.env.WEB_PORT ?? 9000);
+  const apiUrl = env.VITE_API_URL ?? "http://localhost:9001";
+
+  return {
+    plugins: [react()],
+    envDir,
+    server: {
+      // Listen on all interfaces so both http://localhost and http://127.0.0.1 work (Windows IPv6)
+      host: true,
+      port,
+      strictPort: true,
+      proxy: {
+        "/api": { target: apiUrl, changeOrigin: true },
+        "/health": { target: apiUrl, changeOrigin: true },
+        "/docs": { target: apiUrl, changeOrigin: true },
+        "/openapi.json": { target: apiUrl, changeOrigin: true },
       },
     },
-  },
-  build: {
-    outDir: "dist",
-    sourcemap: true,
-  },
+    preview: {
+      host: true,
+      port,
+      strictPort: true,
+    },
+    build: {
+      outDir: "dist",
+      sourcemap: true,
+    },
+  };
 });

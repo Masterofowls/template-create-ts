@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./schemas": "./src/schemas.ts",
-    "./security": "./src/security.ts"
+    "./security": "./src/security.ts",
+    "./cors": "./src/cors.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

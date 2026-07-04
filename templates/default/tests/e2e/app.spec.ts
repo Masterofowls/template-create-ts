@@ -11,7 +11,7 @@ test.describe("{{PROJECT_NAME}} E2E", () => {
     expect([200, 503]).toContain(response.status());
     const body = await response.json();
     expect(["ok", "degraded"]).toContain(body.status);
-    expect(body.database).toBeTruthy();
+    expect(body.database?.status).toMatch(/^(ok|degraded|disabled)$/);
   });
 
   test("echo endpoint sanitizes input", async ({ request }) => {

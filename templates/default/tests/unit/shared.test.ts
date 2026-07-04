@@ -1,4 +1,4 @@
-import { healthResponseSchema } from "@pkg/shared/schemas";
+import { healthHttpStatus, healthResponseSchema, resolveServiceStatus } from "@pkg/shared/schemas";
 import { hashValue, safeJsonParse, sanitizeText } from "@pkg/shared/security";
 import { describe, expect, it } from "vitest";
 
@@ -12,6 +12,12 @@ describe("shared schemas", () => {
       database: { status: "ok" as const, dialect: "sqlite" },
     };
     expect(healthResponseSchema.parse(data)).toEqual(data);
+  });
+
+  it("treats disabled database as healthy service", () => {
+    const database = { status: "disabled" as const, dialect: "none" };
+    expect(resolveServiceStatus(database)).toBe("ok");
+    expect(healthHttpStatus(resolveServiceStatus(database))).toBe(200);
   });
 });
 
