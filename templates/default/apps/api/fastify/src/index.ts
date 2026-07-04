@@ -1,4 +1,7 @@
 import cors from "@fastify/cors";
+import swagger from "@fastify/swagger";
+import swaggerUi from "@fastify/swagger-ui";
+import { checkDatabaseHealth } from "@pkg/db/health";
 import { healthResponseSchema } from "@pkg/shared/schemas";
 import { sanitizeText } from "@pkg/shared/security";
 import Fastify from "fastify";
@@ -12,13 +15,27 @@ await fastify.register(cors, {
   credentials: true,
 });
 
-fastify.get("/health", async () => {
-  return healthResponseSchema.parse({
-    status: "ok",
+await fastify.register(swagger, {
+  openapi: {
+    openapi: "3.0.0",
+    info: { title: "{{PROJECT_NAME}} API", version: "1.0.0" },
+  },
+});
+
+await fastify.register(swaggerUi, {
+  routePrefix: "/docs",
+});
+
+fastify.get("/health", async (_request, reply) => {
+  const database = await checkDatabaseHealth();
+  const response = healthResponseSchema.parse({
+    status: database.status === "ok" ? "ok" : "degraded",
     timestamp: new Date().toISOString(),
     version: "1.0.0",
     framework: "fastify",
+    database,
   });
+  return reply.status(response.status === "ok" ? 200 : 503).send(response);
 });
 
 fastify.get("/api/echo", async (request) => {
@@ -46,6 +63,7 @@ io.on("connection", (socket) => {
 try {
   await fastify.listen({ port: env.API_PORT, host: env.API_HOST });
   console.log(`🚀 Fastify API running at http://${env.API_HOST}:${env.API_PORT}`);
+  console.log(`📚 OpenAPI docs at http://${env.API_HOST}:${env.API_PORT}/docs`);
 } catch (err) {
   fastify.log.error(err);
   process.exit(1);

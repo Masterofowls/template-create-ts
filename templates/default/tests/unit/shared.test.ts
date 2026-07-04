@@ -1,5 +1,6 @@
 import { healthResponseSchema } from "@pkg/shared/schemas";
 import { hashValue, safeJsonParse, sanitizeText } from "@pkg/shared/security";
+import { describe, expect, it } from "vitest";
 
 describe("shared schemas", () => {
   it("validates health response", () => {
@@ -8,6 +9,7 @@ describe("shared schemas", () => {
       timestamp: new Date().toISOString(),
       version: "1.0.0",
       framework: "hono",
+      database: { status: "ok" as const, dialect: "sqlite" },
     };
     expect(healthResponseSchema.parse(data)).toEqual(data);
   });

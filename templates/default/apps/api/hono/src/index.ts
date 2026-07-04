@@ -1,41 +1,28 @@
 import { createAdaptorServer } from "@hono/node-server";
-import { healthResponseSchema } from "@pkg/shared/schemas";
-import { sanitizeText } from "@pkg/shared/security";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { Server as SocketServer } from "socket.io";
 import { env } from "./env.ts";
+import { createOpenApiApp } from "./openapi.ts";
 
-const app = new Hono();
+const root = new Hono();
 
-app.use("*", logger());
-app.use(
+root.use("*", logger());
+root.use(
   "*",
   cors({
     origin: env.CORS_ORIGIN,
     credentials: true,
   }),
 );
-app.use("*", secureHeaders());
+root.use("*", secureHeaders());
 
-app.get("/health", (c) => {
-  const response = healthResponseSchema.parse({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-    version: "1.0.0",
-    framework: "hono",
-  });
-  return c.json(response);
-});
+const api = createOpenApiApp();
+root.route("/", api);
 
-app.get("/api/echo", (c) => {
-  const message = c.req.query("message") ?? "hello";
-  return c.json({ message: sanitizeText(message) });
-});
-
-const server = createAdaptorServer(app);
+const server = createAdaptorServer(root);
 
 const io = new SocketServer(server, {
   cors: { origin: env.CORS_ORIGIN, credentials: true },
@@ -48,7 +35,8 @@ io.on("connection", (socket) => {
     socket.emit("pong", { timestamp: Date.now() });
   });
 
-  socket.on("message", (data: { text?: string }) => {
+  socket.on("message", async (data: { text?: string }) => {
+    const { sanitizeText } = await import("@pkg/shared/security");
     const text = sanitizeText(data?.text ?? "");
     io.emit("message", { text, from: socket.id });
   });
@@ -60,7 +48,8 @@ io.on("connection", (socket) => {
 
 server.listen(env.API_PORT, env.API_HOST, () => {
   console.log(`🚀 Hono API running at http://${env.API_HOST}:${env.API_PORT}`);
+  console.log(`📚 OpenAPI docs at http://${env.API_HOST}:${env.API_PORT}/docs`);
   console.log("🔌 Socket.IO attached on same port");
 });
 
-export { app, io, server };
+export { root as app, io, server };

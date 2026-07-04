@@ -1,43 +1,78 @@
 # Architecture
 
-## Overview
+## System Overview
 
-`template-create-ts` is an npm CLI package that scaffolds a Bun monorepo template for fullstack TypeScript applications.
+```mermaid
+flowchart TB
+  subgraph client [Client]
+    Web[React + Vite :9000]
+  end
 
+  subgraph api [API Layer]
+    HonoOrFastify[Hono / Fastify :9001]
+    OpenAPI[OpenAPI /docs]
+    SocketIO[Socket.IO]
+  end
+
+  subgraph packages [Shared Packages]
+    Shared["@pkg/shared\nZod + security"]
+    DB["@pkg/db\nDrizzle ORM"]
+  end
+
+  subgraph data [Data]
+    SQLite[(SQLite file)]
+    Postgres[(PostgreSQL)]
+  end
+
+  Web -->|proxy /api /health| HonoOrFastify
+  Web <-->|websocket| SocketIO
+  HonoOrFastify --> OpenAPI
+  HonoOrFastify --> Shared
+  HonoOrFastify --> DB
+  DB --> SQLite
+  DB --> Postgres
 ```
-template-create-ts (npm CLI)
-└── templates/default/
-    ├── apps/
-    │   ├── api/     → Hono or Fastify + Socket.IO
-    │   └── web/     → React + Vite
-    ├── packages/
-    │   ├── db/      → Drizzle ORM schema & client
-    │   └── shared/  → Zod schemas & security utilities
-    └── tests/
-        ├── unit/    → Jest
-        └── e2e/     → Playwright
-```
 
-## CLI Flow
+## CLI Flow (`template-create-ts`)
 
-1. Copy `templates/default` to target directory
-2. Replace `{{PROJECT_NAME}}` and `{{FRAMEWORK}}` placeholders
-3. Select framework (Hono/Fastify) — copy `src/` and `package.json`
-4. Copy `.env.example` → `.env`
-5. Run `bun install` and `git init`
+1. Copy `templates/default` → target directory
+2. Replace `{{PROJECT_NAME}}`, `{{FRAMEWORK}}`, `{{DB_DIALECT}}`, `{{DATABASE_URL}}`
+3. Select framework (Hono/Fastify) — copy `src/` + `package.json`
+4. Optionally remove web app (`--no-web`) or heavy security deps (`--no-security`)
+5. Generate `.env` with random `APP_SECRET`
+6. Ensure `node_modules/` in `.gitignore`
+7. `bun install` + optional post-scaffold `/health` smoke test
 
 ## Port Allocation
 
-| Service | Port |
-|---------|------|
-| Web (Vite) | 9000 |
-| API | 9001 |
-| Drizzle Studio | 4983 (default) |
+| Service | Port | Notes |
+|---------|------|-------|
+| Web (Vite) | 9000 | `strictPort: true` |
+| API | 9001 | Socket.IO on same port |
+| PostgreSQL | 5432 | Docker Compose only |
+| Drizzle Studio | 4983 | Default |
 
-## Database
+## Health Check
 
-Drizzle ORM with SQLite (libsql) is configured in `@pkg/db`. Example `notes` table schema included as a starting point.
+`GET /health` returns:
 
-## Security Layer
+- `status`: `ok` or `degraded` (based on DB ping)
+- `database.status`: result of `SELECT 1` via Drizzle
+- `framework`: `hono` or `fastify`
 
-`@pkg/shared/security` provides sanitization (XSS, HTML), safe JSON parsing, and crypto utilities used by both API and web layers.
+## Security Tiers
+
+| Script | Tools |
+|--------|-------|
+| `security:quick` | OSV, lockfile-lint, depcheck |
+| `security:full` | quick + Snyk, NodeSecure, bun-scan |
+
+## Release Pipeline
+
+```mermaid
+flowchart LR
+  PR[Pull Request] --> CI[GitHub Actions CI]
+  Merge[Merge to main] --> RP[Release Please]
+  RP --> Tag[v* tag]
+  Tag --> Publish[npm OIDC publish]
+```

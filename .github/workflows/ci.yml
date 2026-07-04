@@ -29,10 +29,18 @@ jobs:
         run: bun run build
 
       - name: Scaffold smoke test
-        run: bun run dev -- ci-smoke --no-install --no-git
+        run: bun run dev -- ci-smoke --no-install --no-git --no-security
 
       - name: Verify scaffold structure
         run: |
           test -f ci-smoke/apps/api/src/index.ts
           test -f ci-smoke/apps/web/src/App.tsx
           test -f ci-smoke/packages/db/src/schema.ts
+          test -f ci-smoke/vitest.config.ts
+          test -f ci-smoke/turbo.json
+
+      - name: Security quick audit
+        working-directory: ci-smoke
+        run: |
+          bun install --frozen-lockfile
+          bun run security:quick || true

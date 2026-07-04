@@ -10,6 +10,9 @@ const envSchema = z.object({
     .default("dev-secret-change-me-in-production-32chars"),
   CORS_ORIGIN: z.string().url().default("http://localhost:9000"),
   DATABASE_URL: z.string().default("file:./local.db"),
+  DB_DIALECT: z
+    .enum(["sqlite", "postgresql"])
+    .default(process.env.DATABASE_URL?.startsWith("postgres") ? "postgresql" : "sqlite"),
 });
 
 function loadEnv() {

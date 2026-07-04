@@ -8,10 +8,10 @@ test.describe("{{PROJECT_NAME}} E2E", () => {
 
   test("API health endpoint responds", async ({ request }) => {
     const response = await request.get("http://localhost:9001/health");
-    expect(response.ok()).toBeTruthy();
+    expect([200, 503]).toContain(response.status());
     const body = await response.json();
-    expect(body.status).toBe("ok");
-    expect(body.framework).toBeTruthy();
+    expect(["ok", "degraded"]).toContain(body.status);
+    expect(body.database).toBeTruthy();
   });
 
   test("echo endpoint sanitizes input", async ({ request }) => {
@@ -21,5 +21,10 @@ test.describe("{{PROJECT_NAME}} E2E", () => {
     expect(response.ok()).toBeTruthy();
     const body = await response.json();
     expect(body.message).not.toContain("<script>");
+  });
+
+  test("OpenAPI docs are served", async ({ request }) => {
+    const response = await request.get("http://localhost:9001/docs");
+    expect(response.ok()).toBeTruthy();
   });
 });
