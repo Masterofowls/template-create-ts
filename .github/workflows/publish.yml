@@ -74,12 +74,7 @@ jobs:
             exit 1
           fi
 
-      - name: Publish to npm (OIDC trusted publisher)
-        if: ${{ secrets.NPM_TOKEN == '' }}
-        run: npm publish --provenance --access public
-
-      - name: Publish to npm (NPM_TOKEN fallback)
-        if: ${{ secrets.NPM_TOKEN != '' }}
+      - name: Publish to npm
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
