@@ -4,6 +4,14 @@ test.describe("{{PROJECT_NAME}} E2E", () => {
   test("homepage loads with project title", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("h1")).toContainText("{{PROJECT_NAME}}");
+    await expect(page.getByText("Hello, template user!")).toBeVisible();
+  });
+
+  test("hello API endpoint responds", async ({ request }) => {
+    const response = await request.get("http://localhost:9001/api/hello");
+    expect(response.ok()).toBeTruthy();
+    const body = await response.json();
+    expect(body.message).toContain("Hello");
   });
 
   test("API health endpoint responds", async ({ request }) => {

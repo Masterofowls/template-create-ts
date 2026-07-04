@@ -17,5 +17,6 @@ localhost-test/
 no-db-test/
 test-dev-app/
 fastify-only-test/
+vite-web-test/
 /.cursor
 /docs

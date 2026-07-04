@@ -31,6 +31,7 @@
       "test-dev-app",
       "v12-test",
       "fastify-only-test",
+      "vite-web-test",
       "git-fix-test",
       "templates/**/node_modules",
       "templates/**/dist"

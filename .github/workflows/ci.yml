@@ -35,6 +35,8 @@ jobs:
         run: |
           test -f ci-smoke/apps/api/src/index.ts
           test -f ci-smoke/apps/web/src/App.tsx
+          test -f ci-smoke/apps/web/src/pages/HomePage.tsx
+          test -f ci-smoke/apps/web/public/favicon.svg
           test -f ci-smoke/packages/db/src/schema.ts
           test -f ci-smoke/packages/db/src/client.ts
           test -f ci-smoke/scripts/dev.ts

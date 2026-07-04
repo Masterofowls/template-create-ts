@@ -70,7 +70,7 @@ git push origin main --tags
 # Or merge the Release Please PR (automated)
 ```
 
-Current version: **1.3.0** — Fastify-only API (Hono removed), localhost dev, optional DB (`--db none`).
+Current version: **1.3.1** — welcome UX, full Vite web (`public/`, `src/pages/`, favicon, `@/` alias).
 
 Tag **must** match `package.json` version (CI enforces this).
 

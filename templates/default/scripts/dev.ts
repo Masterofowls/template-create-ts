@@ -95,7 +95,8 @@ async function main(): Promise<void> {
   }
 
   console.log("✅ API healthy");
-  console.log(`🌐 Starting web at ${WEB_URL}\n`);
+  console.log(`🌐 Starting web at ${WEB_URL}`);
+  console.log(`\n👋 Hello, template user! Open ${WEB_URL} when Vite shows "ready".\n`);
 
   const web = spawnLogged("Web", "bun", ["run", "dev"], join(root, "apps", "web"));
 

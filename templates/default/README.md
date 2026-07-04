@@ -166,7 +166,7 @@ Or just run `bun run dev` from the project root.
 {{PROJECT_NAME}}/
 ├── apps/
 │   ├── api/          # Fastify + Socket.IO + OpenAPI
-│   └── web/          # React frontend
+│   └── web/          # React + Vite (public/, src/pages/, favicon)
 ├── packages/
 │   ├── db/           # Drizzle schema & health checks
 │   └── shared/       # Zod schemas & security utilities

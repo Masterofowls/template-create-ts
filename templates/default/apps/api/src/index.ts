@@ -44,6 +44,10 @@ fastify.get("/health", async (_request, reply) => {
   return reply.status(healthHttpStatus(status)).send(response);
 });
 
+fastify.get("/api/hello", async () => ({
+  message: "Hello, template user! Welcome to {{PROJECT_NAME}} — your API is ready.",
+}));
+
 fastify.get("/api/echo", async (request) => {
   const { message = "hello" } = request.query as { message?: string };
   return { message: sanitizeText(message) };

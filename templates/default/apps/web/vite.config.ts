@@ -3,19 +3,27 @@ import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
 
 export default defineConfig(({ mode }) => {
-  const envDir = resolve(__dirname, "../..");
+  const root = __dirname;
+  const envDir = resolve(root, "../..");
   const env = loadEnv(mode, envDir, "");
   const port = Number(env.WEB_PORT ?? process.env.WEB_PORT ?? 9000);
   const apiUrl = env.VITE_API_URL ?? "http://localhost:9001";
 
   return {
+    root,
+    publicDir: resolve(root, "public"),
     plugins: [react()],
     envDir,
+    resolve: {
+      alias: {
+        "@": resolve(root, "src"),
+      },
+    },
     server: {
-      // Listen on all interfaces so both http://localhost and http://127.0.0.1 work (Windows IPv6)
       host: true,
       port,
       strictPort: true,
+      open: false,
       proxy: {
         "/api": { target: apiUrl, changeOrigin: true },
         "/health": { target: apiUrl, changeOrigin: true },
@@ -30,6 +38,7 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: "dist",
+      emptyOutDir: true,
       sourcemap: true,
     },
   };
