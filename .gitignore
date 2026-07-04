@@ -12,5 +12,3 @@ test-scaffold/
 verify-app/
 ci-smoke/
 v12-test/
-/.cursor
-/docs
