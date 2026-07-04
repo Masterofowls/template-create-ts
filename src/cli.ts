@@ -142,7 +142,7 @@ function applyFramework(projectDir: string, framework: Framework): void {
 
   const frameworkPkg = join(frameworkDir, "package.json");
   if (existsSync(frameworkPkg)) {
-    cpSync(frameworkPkg, join(apiDir, "package.json"), { overwrite: true });
+    cpSync(frameworkPkg, join(apiDir, "package.json"), { force: true });
   }
 
   mkdirSync(srcDir, { recursive: true });

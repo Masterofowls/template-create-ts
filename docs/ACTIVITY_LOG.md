@@ -11,3 +11,5 @@
 - Built CLI bundle to `dist/cli.js`
 - Prepared npm publish for `template-create-ts@1.0.0`
 - Published `template-create-ts@1.0.0` to npm registry successfully
+- Created GitHub repo https://github.com/Masterofowls/template-create-ts with CI and publish workflows
+- Added npm OIDC trusted publisher setup scripts (`scripts/configure-npm-trust.ps1`)
