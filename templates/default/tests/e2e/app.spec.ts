@@ -4,7 +4,7 @@ test.describe("{{PROJECT_NAME}} E2E", () => {
   test("homepage loads with project title", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("h1")).toContainText("{{PROJECT_NAME}}");
-    await expect(page.getByText("Hello, template user!")).toBeVisible();
+    await expect(page.locator(".welcome-hello")).toHaveText("Hello, template user!");
   });
 
   test("hello API endpoint responds", async ({ request }) => {

@@ -4,7 +4,11 @@ import DOMPurify from "isomorphic-dompurify";
 import secureJsonParse from "secure-json-parse";
 import xss from "xss";
 
-const SECRET_KEY = process.env.APP_SECRET ?? "dev-secret-change-me-in-production-32chars";
+function getSecretKey(): string {
+  const fromEnv =
+    typeof process !== "undefined" ? process.env.APP_SECRET : import.meta.env?.VITE_APP_SECRET;
+  return fromEnv ?? "dev-secret-change-me-in-production-32chars";
+}
 
 export function sanitizeHtml(dirty: string): string {
   return DOMPurify.sanitize(dirty, { USE_PROFILES: { html: true } });
@@ -23,11 +27,11 @@ export function hashValue(value: string): string {
 }
 
 export function encryptValue(value: string): string {
-  return CryptoJS.AES.encrypt(value, SECRET_KEY).toString();
+  return CryptoJS.AES.encrypt(value, getSecretKey()).toString();
 }
 
 export function decryptValue(encrypted: string): string {
-  const bytes = CryptoJS.AES.decrypt(encrypted, SECRET_KEY);
+  const bytes = CryptoJS.AES.decrypt(encrypted, getSecretKey());
   return bytes.toString(CryptoJS.enc.Utf8);
 }
 

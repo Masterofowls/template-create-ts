@@ -21,4 +21,5 @@
 - **v1.3.0** — Removed Hono; Fastify is the only API (flat `apps/api/src` layout); dropped `-f` / `--framework` CLI flag
 - Default first-run UX: welcome hero ("Hello, template user!"), `/api/hello`, dev terminal hint with localhost URL
 - Web: standard Vite layout (`public/`, `src/pages/`, favicon, `@/` alias, tsconfig project references)
-- Published **template-create-ts@1.3.1** — welcome UX, `/api/hello`, full Vite web structure
+- Published **template-create-ts@1.3.1** — welcome UX, `/api/hello`, full Vite web web structure
+- **v1.3.2** — Fix blank web page: `packages/shared/security.ts` no longer references `process.env` at module load (crashed browser with `process is not defined`)
