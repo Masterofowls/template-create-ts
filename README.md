@@ -99,6 +99,8 @@ npm trust github template-create-ts \
 
 ### Release a new version
 
+See [docs/PUBLISHING.md](docs/PUBLISHING.md) for OIDC trusted publisher setup and 404 troubleshooting.
+
 ```bash
 npm version patch
 git push origin main --tags
