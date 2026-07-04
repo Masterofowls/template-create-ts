@@ -19,6 +19,14 @@
     "formatter": { "quoteStyle": "double", "semicolons": "always" }
   },
   "files": {
-    "ignore": ["dist", "node_modules", "templates/**/node_modules", "templates/**/dist"]
+    "ignore": [
+      "dist",
+      "node_modules",
+      "test-scaffold",
+      "verify-app",
+      "ci-smoke",
+      "templates/**/node_modules",
+      "templates/**/dist"
+    ]
   }
 }

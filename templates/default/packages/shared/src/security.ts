@@ -1,6 +1,6 @@
 import CryptoJS from "crypto-js";
-import DOMPurify from "isomorphic-dompurify";
 import isUnsafe from "is-unsafe";
+import DOMPurify from "isomorphic-dompurify";
 import secureJsonParse from "secure-json-parse";
 import xss from "xss";
 

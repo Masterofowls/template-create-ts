@@ -64,12 +64,48 @@ template-create-ts <project-name> [options]
 ## Development
 
 ```bash
-git clone <repo>
+git clone https://github.com/Masterofowls/template-create-ts.git
 cd template-create-ts
 bun install
 bun run build
 bun run dev -- my-test-app --no-install
 ```
+
+## CI/CD & npm Trusted Publishing
+
+GitHub Actions workflows:
+
+| Workflow | File | Trigger |
+|----------|------|---------|
+| CI | `.github/workflows/ci.yml` | Push/PR to `main` |
+| Publish | `.github/workflows/publish.yml` | Tag `v*`, release, or manual dispatch |
+
+Publishing uses **npm trusted publishers** (OIDC) — no long-lived npm tokens in GitHub Secrets.
+
+### One-time setup (package owner)
+
+```powershell
+$env:NPM_TOKEN = "npm_..."   # granular token with publish permission
+./scripts/configure-npm-trust.ps1
+```
+
+Or with npm CLI v11+ directly:
+
+```bash
+npm trust github template-create-ts \
+  --file publish.yml \
+  --repo Masterofowls/template-create-ts \
+  --allow-publish -y
+```
+
+### Release a new version
+
+```bash
+npm version patch
+git push origin main --tags
+```
+
+The `publish.yml` workflow publishes to npm with provenance when a `v*` tag is pushed.
 
 ## License
 

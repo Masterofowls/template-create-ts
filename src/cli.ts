@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { spawn, spawnSync } from "node:child_process";
 import {
   cpSync,
   existsSync,
@@ -12,7 +13,6 @@ import {
 } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { spawn, spawnSync } from "node:child_process";
 
 import { parseArgs } from "node:util";
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -20,7 +20,11 @@ const TEMPLATES_DIR = join(__dirname, "..", "templates");
 
 function runCommand(command: string, args: string[], cwd: string): Promise<number> {
   return new Promise((resolve) => {
-    const proc = spawn(command, args, { cwd, stdio: "inherit", shell: process.platform === "win32" });
+    const proc = spawn(command, args, {
+      cwd,
+      stdio: "inherit",
+      shell: process.platform === "win32",
+    });
     proc.on("close", (code) => resolve(code ?? 1));
     proc.on("error", () => resolve(1));
   });

@@ -1,5 +1,5 @@
 import { healthResponseSchema } from "@pkg/shared/schemas";
-import { sanitizeText, safeJsonParse, hashValue } from "@pkg/shared/security";
+import { hashValue, safeJsonParse, sanitizeText } from "@pkg/shared/security";
 
 describe("shared schemas", () => {
   it("validates health response", () => {

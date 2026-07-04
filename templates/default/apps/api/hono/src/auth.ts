@@ -1,6 +1,6 @@
+import { db, schema } from "@pkg/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db, schema } from "@pkg/db";
 import { env } from "./env.ts";
 
 export function createAuth() {

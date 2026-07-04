@@ -11,3 +11,5 @@ coverage/
 test-scaffold/
 verify-app/
 ci-smoke/
+/.cursor
+/docs

@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import { io, type Socket } from "socket.io-client";
 import { sanitizeText } from "@pkg/shared/security";
+import { useCallback, useEffect, useState } from "react";
+import { type Socket, io } from "socket.io-client";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:9001";
 
@@ -11,10 +11,15 @@ interface HealthStatus {
   framework: string;
 }
 
+interface ChatMessage {
+  id: string;
+  text: string;
+}
+
 export function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
 
   useEffect(() => {
@@ -26,7 +31,7 @@ export function App() {
     const s = io(API_URL);
     s.on("connect", () => console.log("[socket] connected"));
     s.on("message", (data: { text: string }) => {
-      setMessages((prev) => [...prev, data.text]);
+      setMessages((prev) => [...prev, { id: crypto.randomUUID(), text: data.text }]);
     });
     setSocket(s);
 
@@ -44,25 +49,21 @@ export function App() {
   return (
     <div className="app">
       <header>
-        <h1>{{PROJECT_NAME}}</h1>
-        <p>Fullstack TypeScript template — React + {{FRAMEWORK}} + Drizzle + Better Auth</p>
+        <h1>{"{{PROJECT_NAME}}"}</h1>
+        <p>{"Fullstack TypeScript template — React + {{FRAMEWORK}} + Drizzle + Better Auth"}</p>
       </header>
 
       <section className="card">
         <h2>API Health</h2>
-        {health ? (
-          <pre>{JSON.stringify(health, null, 2)}</pre>
-        ) : (
-          <p>Loading...</p>
-        )}
+        {health ? <pre>{JSON.stringify(health, null, 2)}</pre> : <p>Loading...</p>}
       </section>
 
       <section className="card">
         <h2>Socket.IO Chat</h2>
         <div className="messages">
-          {messages.map((msg, i) => (
-            <div key={`${msg}-${i}`} className="message">
-              {msg}
+          {messages.map((msg) => (
+            <div key={msg.id} className="message">
+              {msg.text}
             </div>
           ))}
         </div>

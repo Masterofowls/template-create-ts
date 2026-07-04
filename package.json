@@ -7,10 +7,7 @@
     "template-create-ts": "dist/cli.js",
     "create-ts-app": "dist/cli.js"
   },
-  "files": [
-    "dist",
-    "templates"
-  ],
+  "files": ["dist", "templates"],
   "scripts": {
     "build": "bun build ./src/cli.ts --outdir dist --target node",
     "dev": "bun run src/cli.ts",

@@ -1,8 +1,8 @@
-import Fastify from "fastify";
 import cors from "@fastify/cors";
-import { Server as SocketServer } from "socket.io";
 import { healthResponseSchema } from "@pkg/shared/schemas";
 import { sanitizeText } from "@pkg/shared/security";
+import Fastify from "fastify";
+import { Server as SocketServer } from "socket.io";
 import { createAuth } from "./auth.ts";
 import { env } from "./env.ts";
 
